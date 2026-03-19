@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gavrie Aquino — Applied Physics & ML</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   DESIGN TOKENS — edit colors here
+   ============================================================ */
+:root {
+  --purple:        #7c3aed;
+  --purple-light:  #a78bfa;
+  --purple-dim:    #4c1d95;
+  --purple-glow:   #7c3aed33;
+  --accent:        #c4b5fd;
+
+  /* DARK MODE (default) */
+  --bg:            #0d0d12;
+  --bg-2:          #13131a;
+  --bg-3:          #1a1a26;
+  --border:        #2a2a3d;
+  --border-accent: #7c3aed55;
+  --text:          #e8e6f0;
+  --text-muted:    #6b6880;
+  --text-dim:      #3d3a50;
+  --card-bg:       #13131a;
+  --pixel-color:   #7c3aed;
+
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body:  'DM Sans', sans-serif;
+
+  --radius: 2px;
+  --transition: 0.2s ease;
+}
+
+[data-theme="light"] {
+  --bg:            #f5f3ff;
+  --bg-2:          #ffffff;
+  --bg-3:          #ede9fe;
+  --border:        #ddd6fe;
+  --border-accent: #7c3aed55;
+  --text:          #1e1b2e;
+  --text-muted:    #6b6880;
+  --text-dim:      #c4b5fd;
+  --card-bg:       #ffffff;
+  --pixel-color:   #7c3aed;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  transition: background var(--transition), color var(--transition);
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ============================================================
+   PIXEL UTILITIES
+   ============================================================ */
+.pixel-border {
+  border: 2px solid var(--border);
+  image-rendering: pixelated;
+  box-shadow: 4px 4px 0 var(--border);
+}
+.pixel-border:hover {
+  box-shadow: 6px 6px 0 var(--purple-dim);
+  border-color: var(--purple-light);
+  transform: translate(-1px, -1px);
+  transition: all var(--transition);
+}
+
+.pixel-tag {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--accent);
+  background: var(--purple-glow);
+  border: 1px solid var(--border-accent);
+  padding: 4px 8px;
+  letter-spacing: 0.05em;
+  image-rendering: pixelated;
+}
+
+/* ============================================================
+   PIXEL ART — astronaut avatar (CSS only)
+   ============================================================ */
+.pixel-avatar {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  display: inline-block;
+}
+/* We'll use a canvas-drawn pixel avatar */
+#avatarCanvas {
+  image-rendering: pixelated;
+  width: 96px;
+  height: 96px;
+}
+
+/* ============================================================
+   PIXEL STAR FIELD
+   ============================================================ */
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  background: var(--accent);
+  image-rendering: pixelated;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2.5rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--purple-light);
+  letter-spacing: 0.05em;
+}
+.nav-logo span { color: var(--accent); }
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  align-items: center;
+}
+.nav-links a {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  transition: color var(--transition);
+}
+.nav-links a:hover { color: var(--purple-light); }
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 6px 10px;
+  transition: all var(--transition);
+}
+.theme-toggle:hover {
+  border-color: var(--purple-light);
+  color: var(--purple-light);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+section {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--purple-light);
+  letter-spacing: 0.12em;
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '▶';
+  color: var(--purple);
+  font-size: 8px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  padding: 6rem 0 5rem;
+  border-bottom: 1px solid var(--border);
+}
+.hero-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.hero-left { flex: 1; min-width: 280px; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+.blink {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: #22c55e;
+  animation: blink 1.2s steps(1) infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.hero-badge-text {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: #22c55e;
+  letter-spacing: 0.08em;
+}
+
+.hero-name {
+  font-family: var(--font-pixel);
+  font-size: clamp(14px, 3vw, 22px);
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
+.hero-name .highlight { color: var(--purple-light); }
+
+.hero-title {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.04em;
+}
+
+.hero-bio {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 520px;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+  font-weight: 300;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 10px 18px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all var(--transition);
+  display: inline-block;
+}
+.btn-primary {
+  background: var(--purple);
+  color: #fff;
+  border: 2px solid var(--purple);
+  box-shadow: 3px 3px 0 var(--purple-dim);
+}
+.btn-primary:hover {
+  background: var(--purple-light);
+  border-color: var(--purple-light);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--purple-dim);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border: 2px solid var(--border);
+  box-shadow: 3px 3px 0 var(--text-dim);
+}
+.btn-secondary:hover {
+  border-color: var(--purple-light);
+  color: var(--purple-light);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--purple-dim);
+}
+
+/* AVATAR SIDE */
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.avatar-frame {
+  background: var(--bg-3);
+  border: 2px solid var(--border);
+  box-shadow: 6px 6px 0 var(--border-accent);
+  padding: 16px;
+  position: relative;
+}
+.avatar-frame::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--border-accent);
+  pointer-events: none;
+}
+.avatar-name-tag {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+.hero-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+.stat {
+  text-align: center;
+}
+.stat-val {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--purple-light);
+  display: block;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-pixel);
+  font-size: 6px;
+}
+
+/* ============================================================
+   ABOUT / EXPERIENCE
+   ============================================================ */
+.exp-list { display: flex; flex-direction: column; gap: 1.5rem; }
+.exp-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  position: relative;
+}
+.exp-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--purple);
+}
+.exp-card:hover {
+  border-color: var(--border-accent);
+  transform: translateX(3px);
+}
+.exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.exp-org {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--purple-light);
+  margin-bottom: 4px;
+}
+.exp-role {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+.exp-date {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.exp-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+.exp-desc li { margin-left: 1.2rem; margin-top: 4px; }
+.award-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: #f59e0b;
+  background: #f59e0b18;
+  border: 1px solid #f59e0b44;
+  padding: 4px 8px;
+  margin-top: 8px;
+}
+
+/* ============================================================
+   PROJECTS
+   ============================================================ */
+.projects-category { margin-bottom: 3rem; }
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.category-icon {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+}
+.category-title {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--text);
+  letter-spacing: 0.06em;
+}
+.category-count {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* ── ADD NEW PROJECT placeholder card ── */
+.project-card-add {
+  background: transparent;
+  border: 2px dashed var(--border);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: default;
+  opacity: 0.5;
+  min-height: 180px;
+}
+.add-icon {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.add-label {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.project-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.project-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 20px var(--purple-glow);
+  transform: translateY(-2px);
+}
+.project-card-tag {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.project-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+}
+.project-card-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+  flex: 1;
+}
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+.stack-pill {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: var(--text-muted);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  padding: 3px 7px;
+  letter-spacing: 0.04em;
+}
+.project-status {
+  position: absolute;
+  top: 12px; right: 12px;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  padding: 3px 7px;
+}
+.status-ongoing {
+  color: #22c55e;
+  background: #22c55e18;
+  border: 1px solid #22c55e44;
+}
+.status-done {
+  color: var(--accent);
+  background: var(--purple-glow);
+  border: 1px solid var(--border-accent);
+}
+
+/* ============================================================
+   TEAM PROJECTS
+   ============================================================ */
+.team-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all var(--transition);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: start;
+}
+.team-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 4px 4px 0 var(--border-accent);
+}
+.team-card-body {}
+.team-card-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.team-role-badge {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: var(--purple-light);
+  background: var(--purple-glow);
+  border: 1px solid var(--border-accent);
+  padding: 4px 8px;
+  text-align: right;
+}
+.team-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.team-card-sub {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--purple-light);
+  margin-bottom: 0.75rem;
+}
+.team-card-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ============================================================
+   SKILLS
+   ============================================================ */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+.skill-group {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+}
+.skill-group-title {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--purple-light);
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.skill-list { list-style: none; }
+.skill-list li {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--bg-3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 300;
+}
+.skill-list li::before {
+  content: '▸';
+  color: var(--purple);
+  font-size: 10px;
+  font-family: var(--font-pixel);
+}
+
+/* ============================================================
+   EDUCATION & CERTS
+   ============================================================ */
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.cert-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-weight: 300;
+  transition: border-color var(--transition);
+}
+.cert-card:hover { border-color: var(--border-accent); }
+.cert-icon {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--purple-light);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-heading {
+  font-family: var(--font-pixel);
+  font-size: clamp(12px, 2.5vw, 18px);
+  color: var(--text);
+  line-height: 2;
+  margin-bottom: 1rem;
+}
+.contact-heading .hl { color: var(--purple-light); }
+.contact-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 460px;
+  font-weight: 300;
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+}
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  max-width: 520px;
+}
+.contact-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--card-bg);
+  transition: background var(--transition);
+  cursor: pointer;
+  gap: 1rem;
+}
+.contact-link:hover { background: var(--bg-3); }
+.contact-link-label {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+.contact-link-value {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--purple-light);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  padding: 2rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+footer p {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   PIXEL DECORATIONS
+   ============================================================ */
+.pixel-divider {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 1.5rem 0;
+}
+.pixel-divider span {
+  display: inline-block;
+  width: 4px; height: 4px;
+  background: var(--border);
+}
+.pixel-divider span:nth-child(3) { background: var(--purple); }
+
+/* ============================================================
+   PROFESSIONAL MODE
+   Pixel font becomes a small accent; everything else uses DM Sans.
+   ============================================================ */
+
+/* — typography overrides — */
+[data-mode="pro"] .nav-links a,
+[data-mode="pro"] .theme-toggle,
+[data-mode="pro"] .mode-toggle,
+[data-mode="pro"] .btn,
+[data-mode="pro"] .hero-title,
+[data-mode="pro"] .hero-badge-text,
+[data-mode="pro"] .avatar-name-tag,
+[data-mode="pro"] .stat-val,
+[data-mode="pro"] .stat-label,
+[data-mode="pro"] .section-label,
+[data-mode="pro"] .exp-org,
+[data-mode="pro"] .exp-date,
+[data-mode="pro"] .category-title,
+[data-mode="pro"] .category-count,
+[data-mode="pro"] .skill-group-title,
+[data-mode="pro"] .contact-link-label,
+[data-mode="pro"] .contact-link-value,
+[data-mode="pro"] .award-badge,
+[data-mode="pro"] .team-card-sub,
+[data-mode="pro"] .team-role-badge,
+[data-mode="pro"] .add-label,
+[data-mode="pro"] .project-status,
+[data-mode="pro"] footer p {
+  font-family: var(--font-body);
+  letter-spacing: normal;
+}
+
+[data-mode="pro"] .hero-name {
+  font-family: var(--font-body);
+  font-size: clamp(40px, 8vw, 64px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+[data-mode="pro"] .contact-heading {
+  font-family: var(--font-body);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+[data-mode="pro"] .hero-title   { font-size: 14px; font-weight: 400; letter-spacing: 0.03em; }
+[data-mode="pro"] .hero-badge-text { font-size: 11px; }
+[data-mode="pro"] .nav-links a  { font-size: 13px; }
+[data-mode="pro"] .theme-toggle,
+[data-mode="pro"] .mode-toggle  { font-size: 12px; border-radius: 4px; }
+
+[data-mode="pro"] .section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+[data-mode="pro"] .stat-val   { font-size: 20px; font-weight: 700; }
+[data-mode="pro"] .stat-label { font-size: 11px; }
+
+[data-mode="pro"] .exp-org {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+[data-mode="pro"] .exp-date { font-size: 12px; }
+
+[data-mode="pro"] .category-title { font-size: 14px; font-weight: 600; }
+[data-mode="pro"] .category-count { font-size: 12px; }
+
+[data-mode="pro"] .skill-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-mode="pro"] .team-card-sub   { font-size: 12px; font-weight: 500; }
+[data-mode="pro"] .team-role-badge { font-size: 11px; font-weight: 500; border-radius: 4px; }
+[data-mode="pro"] .award-badge     { font-size: 11px; font-weight: 500; }
+
+[data-mode="pro"] .contact-link-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+[data-mode="pro"] .contact-link-value { font-size: 13px; }
+[data-mode="pro"] .project-status { font-size: 10px; border-radius: 3px; }
+[data-mode="pro"] .avatar-name-tag { font-size: 11px; font-weight: 500; }
+[data-mode="pro"] .add-label { font-size: 12px; }
+[data-mode="pro"] footer p { font-size: 12px; }
+
+/* — buttons — */
+[data-mode="pro"] .btn {
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 10px 22px;
+  letter-spacing: 0.01em;
+}
+[data-mode="pro"] .btn-primary {
+  box-shadow: 0 2px 12px var(--purple-glow);
+}
+[data-mode="pro"] .btn-primary:hover {
+  box-shadow: 0 6px 24px var(--purple-glow);
+  transform: translateY(-1px);
+}
+[data-mode="pro"] .btn-secondary { box-shadow: none; }
+[data-mode="pro"] .btn-secondary:hover {
+  box-shadow: 0 2px 12px var(--purple-glow);
+  transform: translateY(-1px);
+}
+
+/* — cards & borders — */
+[data-mode="pro"] .pixel-border {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  border-radius: 8px;
+}
+[data-mode="pro"] .pixel-border:hover {
+  box-shadow: 0 8px 28px var(--purple-glow);
+  transform: translateY(-2px);
+}
+
+[data-mode="pro"] .avatar-frame {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px var(--purple-glow);
+}
+[data-mode="pro"] .avatar-frame::before { display: none; }
+
+[data-mode="pro"] .project-card  { border-radius: 8px; }
+[data-mode="pro"] .project-card:hover {
+  box-shadow: 0 8px 32px var(--purple-glow);
+  transform: translateY(-3px);
+}
+[data-mode="pro"] .exp-card    { border-radius: 8px; }
+[data-mode="pro"] .skill-group { border-radius: 8px; }
+[data-mode="pro"] .cert-card   { border-radius: 8px; }
+[data-mode="pro"] .team-card   { border-radius: 8px; }
+[data-mode="pro"] .team-card:hover {
+  box-shadow: 0 6px 24px var(--purple-glow);
+}
+
+/* — starfield: subtle in pro mode — */
+[data-mode="pro"] #starfield { opacity: 0.15; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px) {
+  nav { padding: 1rem 1.25rem; }
+  .container { padding: 0 1.25rem; }
+  .hero-inner { flex-direction: column-reverse; align-items: flex-start; }
+  .nav-links { gap: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- STAR FIELD -->
+<div id="starfield"></div>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav>
+  <div class="nav-logo"><span>★</span> gavrie.dev</div>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#contact">contact</a></li>
+    <li><button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀ light</button></li>
+    <li><button class="theme-toggle mode-toggle" onclick="toggleMode()" id="modeBtn">◈ pro</button></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="blink"></span>
+          <span class="hero-badge-text">open to research · internships · freelance</span>
+        </div>
+        <h1 class="hero-name">GAVRIE<br><span class="highlight">AQUINO</span></h1>
+        <div class="hero-title">applied physics @ UPLB · yr 3 of 4</div>
+        <p class="hero-bio">
+          Applied Physics student with hands-on experience in machine learning and data science —
+          from coral reef segmentation to AI-powered agricultural systems.
+          Passionate about using physics and computation to solve real problems.
+        </p>
+        <div class="hero-cta">
+          <a href="#projects" class="btn btn-primary">▶ view projects</a>
+          <a href="#contact" class="btn btn-secondary">✉ get in touch</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="avatar-frame">
+          <canvas id="avatarCanvas" width="96" height="96"></canvas>
+        </div>
+        <div class="avatar-name-tag">GAVRIE_A.EXE</div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-val">3</span>
+            <span class="stat-label">projects</span>
+          </div>
+          <div class="stat">
+            <span class="stat-val">2</span>
+            <span class="stat-label">fields</span>
+          </div>
+          <div class="stat">
+            <span class="stat-val">1st</span>
+            <span class="stat-label">hackathon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EXPERIENCE
+     ============================================================ -->
+<section id="about">
+  <div class="container">
+    <div class="section-label">experience</div>
+    <div class="exp-list">
+
+      <!-- ── EDIT: Add / remove experience cards below ── -->
+
+      <div class="exp-card">
+        <div class="exp-header">
+          <div>
+            <div class="exp-org">Alibaba Cloud PH Hackathon</div>
+            <div class="exp-role">Product Strategist & ML Developer — KonsulTAnim</div>
+          </div>
+          <div class="exp-date">Nov 2025</div>
+        </div>
+        <div class="exp-desc">
+          <ul>
+            <li>Helped implement ML features for KonsulTAnim, a multi-agent AI platform for farmers with unstable internet — available as a web app and via SMS.</li>
+            <li>System provided weather advisories, crop disease detection, and crop insurance assistance.</li>
+          </ul>
+          <div class="award-badge">★ 1st place — 14 teams</div>
+        </div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-header">
+          <div>
+            <div class="exp-org">StartUp QC: APPogado — Legal Tech Social Enterprise</div>
+            <div class="exp-role">Core Team Member & Product Strategist</div>
+          </div>
+          <div class="exp-date">Feb 2026 — Ongoing</div>
+        </div>
+        <div class="exp-desc">
+          <ul>
+            <li>Conducting market analysis and business modeling to build a B2G and B2B revenue model while keeping core services free for low-income users.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-header">
+          <div>
+            <div class="exp-org">Dataverse / UPLB Data Science Guild</div>
+            <div class="exp-role">Training and Skills Committee → Externals Committee</div>
+          </div>
+          <div class="exp-date">Mar 2025 — Ongoing</div>
+        </div>
+        <div class="exp-desc">
+          <ul>
+            <li>Conducted a 3-day external workshop on data science, EDA, and ML in Python in partnership with UP Rural High School.</li>
+            <li>Oversaw development and execution of internal workshops. Now managing external partnerships and collaborations.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SOLO PROJECTS
+     ============================================================ -->
+<section id="projects">
+  <div class="container">
+    <div class="section-label">solo projects</div>
+
+    <!-- ════════════════════════════════════════════
+         CATEGORY: COMPUTER VISION / SCIENCE
+         ════════════════════════════════════════════ -->
+    <div class="projects-category">
+      <div class="category-header">
+        <span class="category-icon">🔬</span>
+        <span class="category-title">Science & Computer Vision</span>
+        <span class="category-count">1 project</span>
+      </div>
+      <div class="project-grid">
+
+        <!-- ── EDIT: Duplicate a .project-card block to add a project ── -->
+        <div class="project-card">
+          <span class="project-status status-ongoing">● ongoing</span>
+          <div class="project-card-tag">thesis · computer vision</div>
+          <div class="project-card-title">Semantic Segmentation for Coral Coverage Mapping</div>
+          <div class="project-card-desc">
+            Exploring CNNs (primarily Attention U-Net) to segment healthy and unhealthy corals from 3000+ images
+            in the Apo Reef Natural Reserve — estimating percent coral coverage.
+          </div>
+          <div class="project-stack">
+            <span class="stack-pill">PyTorch</span>
+            <span class="stack-pill">Python</span>
+            <span class="stack-pill">CVAT</span>
+            <span class="stack-pill">U-Net</span>
+          </div>
+        </div>
+
+        <!-- ADD NEW PROJECT PLACEHOLDER -->
+        <div class="project-card-add">
+          <div class="add-icon">+</div>
+          <div class="add-label">add project here</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         CATEGORY: FINTECH
+         ════════════════════════════════════════════ -->
+    <div class="projects-category">
+      <div class="category-header">
+        <span class="category-icon">💹</span>
+        <span class="category-title">FinTech</span>
+        <span class="category-count">1 project</span>
+      </div>
+      <div class="project-grid">
+
+        <div class="project-card">
+          <span class="project-status status-done">✓ done</span>
+          <div class="project-card-tag">financial modeling · simulation</div>
+          <div class="project-card-title">JPMorgan Quantitative Research Simulation</div>
+          <div class="project-card-desc">
+            Trained logistic regression, decision tree, and gradient boosting classifiers to predict loan default probability.
+            Implemented dynamic programming to optimally bucket FICO scores into credit rating categories.
+          </div>
+          <div class="project-stack">
+            <span class="stack-pill">Python</span>
+            <span class="stack-pill">scikit-learn</span>
+            <span class="stack-pill">pandas</span>
+          </div>
+        </div>
+
+        <div class="project-card-add">
+          <div class="add-icon">+</div>
+          <div class="add-label">add project here</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         CATEGORY: HEALTHCARE
+         ════════════════════════════════════════════ -->
+    <div class="projects-category">
+      <div class="category-header">
+        <span class="category-icon">🏥</span>
+        <span class="category-title">Healthcare</span>
+        <span class="category-count">1 project</span>
+      </div>
+      <div class="project-grid">
+
+        <div class="project-card">
+          <span class="project-status status-done">✓ done</span>
+          <div class="project-card-tag">epidemiology · time series</div>
+          <div class="project-card-title">Philippines HIV/AIDS Epidemiological Forecasting</div>
+          <div class="project-card-desc">
+            Extracted 9 quarters of HIV surveillance data from DOH reports. Built ARIMA time series models to forecast
+            quarterly case counts and identified key epidemiological trends to inform public health resource allocation.
+          </div>
+          <div class="project-stack">
+            <span class="stack-pill">Python</span>
+            <span class="stack-pill">pandas</span>
+            <span class="stack-pill">ARIMA</span>
+            <span class="stack-pill">matplotlib</span>
+          </div>
+        </div>
+
+        <div class="project-card-add">
+          <div class="add-icon">+</div>
+          <div class="add-label">add project here</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         ADD A NEW CATEGORY — copy the block above
+         ════════════════════════════════════════════ -->
+
+  </div>
+</section>
+
+<!-- ============================================================
+     TEAM PROJECTS
+     ============================================================ -->
+<section id="team">
+  <div class="container">
+    <div class="section-label">team projects</div>
+
+    <!-- ── EDIT: Duplicate a .team-card block to add a team project ── -->
+
+    <div class="team-card">
+      <div class="team-card-body">
+        <div class="team-card-title">KonsulTAnim</div>
+        <div class="team-card-sub">Alibaba Cloud PH Hackathon 2025 · 🏆 1st Place</div>
+        <div class="team-card-desc">
+          Multi-agent AI platform for Filipino farmers in areas with poor connectivity.
+          Provides weather advisories, crop disease detection, and crop insurance assistance —
+          available as a web app and via SMS.
+        </div>
+        <div class="project-stack" style="margin-top:0.75rem;">
+          <span class="stack-pill">Python</span>
+          <span class="stack-pill">PyTorch</span>
+          <span class="stack-pill">Multi-agent AI</span>
+          <span class="stack-pill">SMS API</span>
+        </div>
+      </div>
+      <div class="team-card-side">
+        <div class="team-role-badge">ML developer<br>+ product strategist</div>
+      </div>
+    </div>
+
+    <div class="team-card">
+      <div class="team-card-body">
+        <div class="team-card-title">APPogado</div>
+        <div class="team-card-sub">StartUp QC — Legal Tech Social Enterprise · Ongoing</div>
+        <div class="team-card-desc">
+          Legal tech platform targeting B2G and B2B revenue while keeping core legal services
+          free for low-income users. Built around a sustainable social enterprise model.
+        </div>
+        <div class="project-stack" style="margin-top:0.75rem;">
+          <span class="stack-pill">Market Analysis</span>
+          <span class="stack-pill">Business Modeling</span>
+          <span class="stack-pill">B2G / B2B</span>
+        </div>
+      </div>
+      <div class="team-card-side">
+        <div class="team-role-badge">core team<br>+ product strategist</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     SKILLS
+     ============================================================ -->
+<section id="skills">
+  <div class="container">
+    <div class="section-label">skills & tools</div>
+    <div class="skills-grid">
+
+      <!-- ── EDIT: Add / remove skills from each list ── -->
+
+      <div class="skill-group">
+        <div class="skill-group-title">languages</div>
+        <ul class="skill-list">
+          <li>Python</li>
+          <li>SQL</li>
+          <li>Fortran</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">ML / data</div>
+        <ul class="skill-list">
+          <li>PyTorch</li>
+          <li>scikit-learn</li>
+          <li>pandas & NumPy</li>
+          <li>matplotlib</li>
+          <li>Jupyter Notebook</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">tools</div>
+        <ul class="skill-list">
+          <li>Git & GitHub</li>
+          <li>CVAT</li>
+          <li>MS Excel</li>
+          <li>Google Workspace</li>
+          <li>Canva</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">soft skills</div>
+        <ul class="skill-list">
+          <li>Communication</li>
+          <li>Product Management</li>
+          <li>Teamwork</li>
+          <li>Adaptability</li>
+          <li>Teaching / Workshop</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EDUCATION & CERTS
+     ============================================================ -->
+<section>
+  <div class="container">
+    <div class="section-label">education & certifications</div>
+
+    <div class="exp-card" style="margin-bottom:1.5rem;">
+      <div class="exp-header">
+        <div>
+          <div class="exp-org">University of the Philippines Los Baños</div>
+          <div class="exp-role">BS Applied Physics</div>
+        </div>
+        <div class="exp-date">2023 — 2027 (expected)</div>
+      </div>
+      <div class="exp-desc">3rd year · Major: Applied Physics · Focus: Data Science & Machine Learning</div>
+    </div>
+
+    <div class="cert-grid">
+      <!-- ── EDIT: Add / remove cert cards here ── -->
+      <div class="cert-card"><span class="cert-icon">◈</span>Python for Data Science, AI & Development — Coursera</div>
+      <div class="cert-card"><span class="cert-icon">◈</span>Data Analysis with Python — Coursera</div>
+      <div class="cert-card"><span class="cert-icon">◈</span>Machine Learning with Python — Coursera</div>
+      <div class="cert-card"><span class="cert-icon">◈</span>Databases and SQL for Data Science — Coursera</div>
+      <div class="cert-card"><span class="cert-icon">◈</span>Python Project for Data Science — Coursera</div>
+      <div class="cert-card"><span class="cert-icon">◈</span>JPMorgan Quantitative Researcher Job Simulation — Forage</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label">contact</div>
+    <div class="contact-heading">
+      LET'S BUILD<br>SOMETHING <span class="hl">GREAT.</span>
+    </div>
+    <p class="contact-sub">
+      Open to research collaborations, internships, and freelance data science projects.
+      Currently based in the Philippines — happy to work remotely.
+    </p>
+    <div class="contact-links">
+      <!-- ── EDIT: Update href values with your real links ── -->
+      <a href="mailto:gdaquino1@up.edu.ph" class="contact-link">
+        <span class="contact-link-label">email</span>
+        <span class="contact-link-value">gdaquino1@up.edu.ph</span>
+      </a>
+      <a href="https://github.com/gavrie" target="_blank" class="contact-link">
+        <span class="contact-link-label">github</span>
+        <span class="contact-link-value">github.com/gavrie</span>
+      </a>
+      <a href="https://linkedin.com/in/gavrieaquino" target="_blank" class="contact-link">
+        <span class="contact-link-label">linkedin</span>
+        <span class="contact-link-value">linkedin.com/in/gavrieaquino</span>
+      </a>
+      <a href="tel:+639212378942" class="contact-link">
+        <span class="contact-link-label">phone</span>
+        <span class="contact-link-value">+63 921 237 8942</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;width:100%;">
+    <p>// built by gavrie aquino · 2026</p>
+    <p>made with 8 bits of passion ★</p>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+/* ── THEME TOGGLE ── */
+function toggleTheme() {
+  const body = document.body;
+  const btn = document.getElementById('themeBtn');
+  if (body.dataset.theme === 'light') {
+    body.removeAttribute('data-theme');
+    btn.textContent = '☀ light';
+  } else {
+    body.dataset.theme = 'light';
+    btn.textContent = '☾ dark';
+  }
+}
+
+/* ── MODE TOGGLE (pixel ↔ pro) ── */
+function toggleMode() {
+  const body = document.body;
+  const btn = document.getElementById('modeBtn');
+  if (body.dataset.mode === 'pro') {
+    body.removeAttribute('data-mode');
+    btn.textContent = '◈ pro';
+    localStorage.removeItem('mode');
+  } else {
+    body.dataset.mode = 'pro';
+    btn.textContent = '◈ pixel';
+    localStorage.setItem('mode', 'pro');
+  }
+}
+/* restore saved mode */
+(function() {
+  if (localStorage.getItem('mode') === 'pro') {
+    document.body.dataset.mode = 'pro';
+    document.getElementById('modeBtn').textContent = '◈ pixel';
+  }
+})();
+
+/* ── PIXEL STAR FIELD ── */
+(function () {
+  const field = document.getElementById('starfield');
+  const STAR_COUNT = 60;
+  for (let i = 0; i < STAR_COUNT; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() < 0.7 ? 2 : 4;
+    s.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      opacity:${0.1 + Math.random()*0.3};
+      animation: twinkle ${2+Math.random()*4}s steps(2) infinite;
+      animation-delay: ${Math.random()*4}s;
+    `;
+    field.appendChild(s);
+  }
+  const style = document.createElement('style');
+  style.textContent = `@keyframes twinkle{0%,100%{opacity:0.05}50%{opacity:0.4}}`;
+  document.head.appendChild(style);
+})();
+
+/* ── PIXEL ASTRONAUT AVATAR ── */
+(function () {
+  const canvas = document.getElementById('avatarCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  // 16x16 pixel art astronaut — colors: helmet, suit, visor, shadow
+  const H = '#c4b5fd'; // helmet / suit (light purple)
+  const S = '#7c3aed'; // suit accent (purple)
+  const D = '#4c1d95'; // dark shadow
+  const V = '#93c5fd'; // visor (blue)
+  const W = '#ffffff'; // white
+  const _ = null;      // transparent
+
+  const pixels = [
+    [_,_,_,H,H,H,H,H,H,H,H,H,H,_,_,_],
+    [_,_,H,H,H,H,H,H,H,H,H,H,H,H,_,_],
+    [_,H,H,D,D,D,D,D,D,D,D,D,D,H,H,_],
+    [H,H,D,V,V,V,V,V,V,V,V,V,V,D,H,H],
+    [H,H,D,V,V,V,V,V,V,V,V,V,V,D,H,H],
+    [H,H,D,V,V,W,V,V,V,V,W,V,V,D,H,H],
+    [H,H,D,V,V,V,V,V,V,V,V,V,V,D,H,H],
+    [_,H,H,D,D,D,D,D,D,D,D,D,D,H,H,_],
+    [_,_,H,H,S,S,S,S,S,S,S,S,H,H,_,_],
+    [_,_,S,H,H,H,H,H,H,H,H,H,H,S,_,_],
+    [_,S,S,H,H,H,H,H,H,H,H,H,H,S,S,_],
+    [_,S,H,H,H,H,H,H,H,H,H,H,H,H,S,_],
+    [_,S,H,H,_,_,H,H,H,H,_,_,H,H,S,_],
+    [_,_,H,H,_,_,H,H,H,H,_,_,H,H,_,_],
+    [_,_,S,S,_,_,S,S,S,S,_,_,S,S,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const pw = canvas.width / 16;
+  const ph = canvas.height / 16;
+
+  pixels.forEach((row, y) => {
+    row.forEach((color, x) => {
+      if (color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x * pw, y * ph, pw, ph);
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
